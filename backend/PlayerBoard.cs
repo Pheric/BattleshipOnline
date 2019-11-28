@@ -48,6 +48,15 @@ namespace server {
             }
         }
 
+        public bool StrikeCell(KeyValuePair<int, int> cell) {
+            foreach (var v in _vessels) {
+                if (v.RemoveCell(cell))
+                    return true;
+            }
+
+            return false;
+        }
+
         public List<Dictionary<KeyValuePair<int, int>, bool>> ExportVessels() {
             var vessels = new List<Dictionary<KeyValuePair<int, int>, bool>>();
             foreach (var v in Vessels)

@@ -5,32 +5,32 @@ using System.Security.Cryptography;
 
 namespace server {
     public class Game {
+        public Guid Guid { get; }
+        public string Password { get; }
+        public GameState State { get; }
+
+        public int Rows { get; }
+        public int Cols { get; }
+        public List<int> VesselLengths { get; }
+        
         private readonly Client[] _clients;
+        public ReadOnlyCollection<Client> GetClients() {
+            return Array.AsReadOnly(_clients);
+        }
 
         public Game() {
             Guid = Guid.NewGuid();
             _clients = new Client[] {null, null};
             using (RandomNumberGenerator rng = new RNGCryptoServiceProvider()) {
-                var data = new byte[8];
+                var data = new byte[9];
                 rng.GetBytes(data);
 
-                Password = Convert.ToBase64String(data);
+                Password = Utils.SanitizeString(Convert.ToBase64String(data).Remove(8));
             }
 
             Rows = 8;
             Cols = 8;
             VesselLengths = new List<int>(new[] {2, 3, 3, 5});
-        }
-
-        public Guid Guid { get; }
-        public string Password { get; }
-
-        public int Rows { get; }
-        public int Cols { get; }
-        public List<int> VesselLengths { get; }
-
-        public ReadOnlyCollection<Client> GetClients() {
-            return Array.AsReadOnly(_clients);
         }
 
         /// <summary>
@@ -48,5 +48,8 @@ namespace server {
 
             return c;
         }
+
+        public Client GetActiveClient() =>
+            State == GameState.PLAYER1 ? _clients[0] : State == GameState.PLAYER2 ? _clients[1] : null;
     }
 }
