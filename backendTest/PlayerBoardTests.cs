@@ -17,8 +17,8 @@ namespace serverTest {
             var lens = new List<int>(new[] {3, 3, 5});
             PlayerBoard board = new PlayerBoard(10, 10, lens);
 
-            Assert.AreEqual(board.Cols, 10);
-            Assert.AreEqual(board.Rows, 10);
+            Assert.AreEqual(10, board.Cols);
+            Assert.AreEqual(10, board.Rows);
             Assert.AreEqual(board.VesselLengths, lens);
 
             return board;
@@ -63,13 +63,13 @@ namespace serverTest {
         [Test]
         public void TestVesselBoundsCheck() {
             var valid = new Vessel(new KeyValuePair<int, int>(2, 4), 5, VesselOrientation.Down);
-            Assert.AreEqual(valid.AssertPositionInBounds(10, 10), true);
+            Assert.AreEqual(true, valid.AssertPositionInBounds(10, 10));
             
             var valid2 = new Vessel(new KeyValuePair<int, int>(0, 9), 1, VesselOrientation.Up);
-            Assert.AreEqual(valid2.AssertPositionInBounds(10, 10), true);
+            Assert.AreEqual(true, valid2.AssertPositionInBounds(10, 10));
             
             var invalid = new Vessel(new KeyValuePair<int, int>(7, 1), 4, VesselOrientation.Right);
-            Assert.AreEqual(invalid.AssertPositionInBounds(10, 10), false);
+            Assert.AreEqual(false, invalid.AssertPositionInBounds(10, 10));
         }
 
         [Test]
@@ -77,16 +77,16 @@ namespace serverTest {
             var v = new Vessel(new KeyValuePair<int, int>(2, 1), 7, VesselOrientation.Down);
 
             bool exists = v.RemoveCell(new KeyValuePair<int, int>(2, 3));
-            Assert.AreEqual(exists, true);
+            Assert.AreEqual(true, exists);
 
             exists = v.RemoveCell(new KeyValuePair<int, int>(2, 7));
-            Assert.AreEqual(exists, true);
+            Assert.AreEqual(true, exists);
 
             bool invalid = v.RemoveCell(new KeyValuePair<int, int>(5, 4));
-            Assert.AreEqual(invalid, false);
+            Assert.AreEqual(false, exists);
 
             invalid = v.RemoveCell(new KeyValuePair<int, int>(2, 3)); // already removed
-            Assert.AreEqual(invalid, false);
+            Assert.AreEqual(false, exists);
         }
     }
 }

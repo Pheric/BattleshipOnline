@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace server {
     public class GameManager {
@@ -10,9 +11,23 @@ namespace server {
             _games = new List<Game>();
         }
 
+        public Game AuthenticateUser(string gameGuid, IRequestCookieCollection cookies) {
+            if (!Guid.TryParse(gameGuid, out var guid))
+                return null;
+
+            if (!cookies.ContainsKey("id") || !cookies.ContainsKey("secret"))
+                return null;
+
+            if (!Guid.TryParse(cookies["id"], out var clientGuid))
+                return null;
+            string clientSecret = cookies["secret"];
+
+            if (!GameManager.Getinstance().AuthenticateUser(guid, clientGuid, clientSecret))
+                return null;
+
+            return _games.Find(g => g.Guid == guid);
+        }
         public bool AuthenticateUser(Guid gameGuid, Guid clientGuid, string clientSecret) {
-            Console.WriteLine($"gameGuid: {gameGuid} clientGuid: {clientGuid} clientSecret: {clientSecret}");
-            
             Game game = _games.Find(g => g.Guid == gameGuid);
             if (game == null)
                 return false;

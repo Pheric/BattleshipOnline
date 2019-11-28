@@ -9,6 +9,7 @@ namespace server {
             Rows = rows;
             Cols = cols;
             VesselLengths = vesselLengths;
+            _vessels = new List<Vessel>();
         }
 
         public int Rows { get; }
@@ -60,7 +61,7 @@ namespace server {
         public List<Dictionary<KeyValuePair<int, int>, bool>> ExportVessels() {
             var vessels = new List<Dictionary<KeyValuePair<int, int>, bool>>();
             foreach (var v in Vessels)
-                vessels.Add(v.exportCells());
+                vessels.Add(v.ExportCells());
 
             return vessels;
         }

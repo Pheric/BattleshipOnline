@@ -39,23 +39,15 @@ namespace api.Controllers {
         }
 
         [HttpGet("{guid}/poll")]
-        public ActionResult<Game> Poll(string guid) {
-            if (!Guid.TryParse(guid, out var gameGuid))
-                return BadRequest();
+        public ActionResult<PollResponse> Poll(string guid) {
+            Game g = GameManager.Getinstance().AuthenticateUser(guid, Request.Cookies);
+            if (g == null)
+                return NotFound();
             
-            if (!Request.Cookies.ContainsKey("id") || !Request.Cookies.ContainsKey("secret"))
-                return BadRequest();
+            var response =
+                new PollResponse(g.Guid, g.State, g.VesselLengths, g.GetActiveClient()?.Board?.ExportVessels());
 
-            if (!Guid.TryParse(Request.Cookies["id"], out var clientGuid))
-                return BadRequest();
-            string clientSecret = Request.Cookies["secret"];
-
-            if (!GameManager.Getinstance().AuthenticateUser(gameGuid, clientGuid, clientSecret))
-                return Unauthorized();
-            
-            // TODO
-            
-            return Ok();
+            return Ok(response);
         }
     }
 }

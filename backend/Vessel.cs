@@ -55,7 +55,7 @@ namespace server {
             return false;
         }
 
-        public Dictionary<KeyValuePair<int, int>, bool> exportCells() {
+        public Dictionary<KeyValuePair<int, int>, bool> ExportCells() {
             var cells = new Dictionary<KeyValuePair<int, int>, bool>();
             foreach (var c in Cells)
                 if (c.Value)

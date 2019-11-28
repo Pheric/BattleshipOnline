@@ -7,7 +7,9 @@ namespace server {
     public class Game {
         public Guid Guid { get; }
         public string Password { get; }
-        public GameState State { get; }
+
+        private GameState _state;
+        public GameState State => _state;
 
         public int Rows { get; }
         public int Cols { get; }
@@ -27,6 +29,7 @@ namespace server {
 
                 Password = Utils.SanitizeString(Convert.ToBase64String(data).Remove(8));
             }
+            _state = GameState.REGISTRATION;
 
             Rows = 8;
             Cols = 8;
@@ -34,22 +37,23 @@ namespace server {
         }
 
         /// <summary>
-        ///     Adds a new Client to the game
+        ///     Adds a new Client to the game and updates the game's state automatically
         /// </summary>
         /// <returns>A new Client or null if the game is already full</returns>
         public Client AddClient() {
             if (_clients[0] != null && _clients[1] != null) return null;
 
             var c = new Client(new PlayerBoard(Rows, Cols, VesselLengths));
-            if (_clients[0] == null)
+            if (_clients[0] == null) {
                 _clients[0] = c;
-            else
+            } else {
                 _clients[1] = c;
+                this._state = GameState.SETUP;
+            }
 
             return c;
         }
 
-        public Client GetActiveClient() =>
-            State == GameState.PLAYER1 ? _clients[0] : State == GameState.PLAYER2 ? _clients[1] : null;
+        public Client GetActiveClient() => State == GameState.PLAYER1 || State == GameState.REGISTRATION ? _clients[0] : State == GameState.PLAYER2 ? _clients[1] : null;
     }
 }
