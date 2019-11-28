@@ -1,0 +1,14 @@
+/home/eric/RiderProjects/api/bin/Debug/netcoreapp2.2/api.deps.json
+/home/eric/RiderProjects/api/bin/Debug/netcoreapp2.2/api.runtimeconfig.json
+/home/eric/RiderProjects/api/bin/Debug/netcoreapp2.2/api.runtimeconfig.dev.json
+/home/eric/RiderProjects/api/bin/Debug/netcoreapp2.2/api.dll
+/home/eric/RiderProjects/api/bin/Debug/netcoreapp2.2/api.pdb
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.csprojAssemblyReference.cache
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.csproj.CoreCompileInputs.cache
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.RazorAssemblyInfo.cache
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.RazorAssemblyInfo.cs
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.AssemblyInfoInputs.cache
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.AssemblyInfo.cs
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.RazorTargetAssemblyInfo.cache
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.dll
+/home/eric/RiderProjects/api/obj/Debug/netcoreapp2.2/api.pdb

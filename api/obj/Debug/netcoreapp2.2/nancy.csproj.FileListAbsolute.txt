@@ -1,0 +1,14 @@
+/home/eric/RiderProjects/nancy/bin/Debug/netcoreapp2.2/nancy.deps.json
+/home/eric/RiderProjects/nancy/bin/Debug/netcoreapp2.2/nancy.runtimeconfig.json
+/home/eric/RiderProjects/nancy/bin/Debug/netcoreapp2.2/nancy.runtimeconfig.dev.json
+/home/eric/RiderProjects/nancy/bin/Debug/netcoreapp2.2/nancy.dll
+/home/eric/RiderProjects/nancy/bin/Debug/netcoreapp2.2/nancy.pdb
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.csprojAssemblyReference.cache
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.csproj.CoreCompileInputs.cache
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.RazorAssemblyInfo.cache
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.RazorAssemblyInfo.cs
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.AssemblyInfoInputs.cache
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.AssemblyInfo.cs
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.RazorTargetAssemblyInfo.cache
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.dll
+/home/eric/RiderProjects/nancy/obj/Debug/netcoreapp2.2/nancy.pdb
