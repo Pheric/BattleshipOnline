@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace api.Controllers {
          */
         [HttpGet]
         public Game Get() {
-            return GameManager.Getinstance().CreateGame();
+            return GameManager.GetInstance().CreateGame();
         }
         
         [HttpPost("{guid}/register")]
@@ -28,7 +29,7 @@ namespace api.Controllers {
             if (!Guid.TryParse(guid, out var gameGuid))
                 return BadRequest();
             
-            Client c = GameManager.Getinstance().RegisterClient(gameGuid, password);
+            Client c = GameManager.GetInstance().RegisterClient(gameGuid, password);
             if (c == null)
                 return NotFound();
             
@@ -38,11 +39,56 @@ namespace api.Controllers {
             return Ok(c);
         }
 
+        [HttpPost("{guid}/setup")]
+        public ActionResult Setup(string guid, SetupRequest setupRequest) {
+            if (!GameManager.GetInstance().AuthenticateUser(guid, Request.Cookies))
+                return NotFound();
+
+            var g = GameManager.GetInstance().GetGameById(guid);
+            if (g.State != GameState.SETUP)
+                return BadRequest();
+            
+            var c = GameManager.GetInstance().GetClientById(Request.Cookies["id"]);
+            if (c.Board.IsSet())
+                return Conflict();
+
+            try {
+                c.Board.Vessels = setupRequest.Vessels;
+                g.IncrementState();
+            } catch (ArgumentException e) {
+                return BadRequest(e.Message);
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("{guid}/strike")]
+        public ActionResult<bool> Strike(string guid, StrikeRequest strikeRequest) {
+            if (!GameManager.GetInstance().AuthenticateUser(guid, Request.Cookies))
+                return NotFound();
+            
+            var g = GameManager.GetInstance().GetGameById(guid);
+            if (g.State != GameState.PLAYER1 && g.State != GameState.PLAYER2)
+                return BadRequest();
+            
+            var c = GameManager.GetInstance().GetClientById(Request.Cookies["id"]);
+            if (c != g.GetActiveClient())
+                return BadRequest();
+
+            g.IncrementState();
+            
+            var opponent = g.GetClients()[0] == c ? g.GetClients()[1] : g.GetClients()[0];
+
+            return Ok(opponent.Board.StrikeCell(strikeRequest.Coordinate));
+        }
+
         [HttpGet("{guid}/poll")]
         public ActionResult<PollResponse> Poll(string guid) {
-            Game g = GameManager.Getinstance().AuthenticateUser(guid, Request.Cookies);
-            if (g == null)
+            if (!GameManager.GetInstance().AuthenticateUser(guid, Request.Cookies))
                 return NotFound();
+
+            // guaranteed non-null because auth passed
+            var g = GameManager.GetInstance().GetGameById(guid);
             
             var response =
                 new PollResponse(g.Guid, g.State, g.VesselLengths, g.GetActiveClient()?.Board?.ExportVessels());

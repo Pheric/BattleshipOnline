@@ -40,29 +40,41 @@ namespace server {
             return cells;
         }
 
+        /// <summary>
+        /// Checks if all cells in this Vessel are in bounds according to the Board size.
+        /// </summary>
+        /// <param name="xMax">The size of the board's X axis</param>
+        /// <param name="yMax">The size of the board's Y axis</param>
+        /// <returns>True if all cells are in bounds, false otherwise</returns>
         public bool AssertPositionInBounds(int xMax, int yMax) {
             return Cells.All(c => c.Key.Key >= 0 && c.Key.Key < xMax && c.Key.Value >= 0 && c.Key.Value < yMax);
         }
 
+        /// <summary>
+        /// Use PlayerBoard#StrikeCell().
+        /// Called when an opponent is firing on the PlayerBoard.
+        /// Marks a cell as hit (true) if it matches the target cell.
+        /// </summary>
+        /// <param name="cell">The coordinates of the cell to hit</param>
+        /// <returns>Whether this Vessel was in that cell, and whether it was then damaged by the
+        /// hit (will return false if already struck there)</returns>
         public bool RemoveCell(KeyValuePair<int, int> cell) {
-            if (_cells.ContainsKey(cell)) {
-                var ret = !_cells[cell];
-                _cells[cell] = true;
+            if (!_cells.TryGetValue(cell, out var cellValue))
+                return false;
 
-                return ret;
-            }
-
-            return false;
+            _cells[cell] = true;
+            return !cellValue;
         }
 
-        public Dictionary<KeyValuePair<int, int>, bool> ExportCells() {
-            var cells = new Dictionary<KeyValuePair<int, int>, bool>();
-            foreach (var c in Cells)
-                if (c.Value)
-                    cells.Add(c.Key, true);
+        /// <summary>
+        /// Exports all hit cells. Safe to return to an opponent because all undamaged
+        /// cells are not included.
+        /// </summary>
+        /// <returns>Coordinates to all hit cells</returns>
+        public List<KeyValuePair<int, int>> ExportCells() => 
+            (from c in _cells where c.Value select c.Key).ToList();
 
-            return cells;
-        }
+            public bool IsSunk() => _cells.All(c => c.Value);
     }
 
     public enum VesselOrientation {

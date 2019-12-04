@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace server {
     public class PlayerBoard {
@@ -49,6 +50,11 @@ namespace server {
             }
         }
 
+        /// <summary>
+        /// Called from the API when the opponent fires upon a cell on this Board.
+        /// </summary>
+        /// <param name="cell">The coordinates of the target cell</param>
+        /// <returns>Whether a vessel was hit</returns>
         public bool StrikeCell(KeyValuePair<int, int> cell) {
             foreach (var v in _vessels) {
                 if (v.RemoveCell(cell))
@@ -58,12 +64,24 @@ namespace server {
             return false;
         }
 
-        public List<Dictionary<KeyValuePair<int, int>, bool>> ExportVessels() {
-            var vessels = new List<Dictionary<KeyValuePair<int, int>, bool>>();
-            foreach (var v in Vessels)
-                vessels.Add(v.ExportCells());
+        /// <summary>
+        /// Whether this board has been set up
+        /// </summary>
+        /// <returns>Whether this board has been set up</returns>
+        public bool IsSet() => _vessels.Count != 0;
 
-            return vessels;
-        }
+        /// <summary>
+        /// Checks whether all Vessels on this PlayerBoard have been sunk.
+        /// </summary>
+        /// <returns>Whether all Vessels have been sunk</returns>
+        public bool IsLost() => _vessels.All(v => v.IsSunk());
+
+        /// <summary>
+        /// Exports all hit cells in all Vessels. Safe to return to an opponent because
+        /// all undamaged cells are not included.
+        /// </summary>
+        /// <returns>A List of Vessels, where every Vessel is a List of its damaged cells</returns>
+        public List<List<KeyValuePair<int, int>>> ExportVessels() =>
+            Vessels.Select(v => v.ExportCells()).ToList();
     }
 }

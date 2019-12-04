@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 
 namespace server {
@@ -11,33 +12,26 @@ namespace server {
             _games = new List<Game>();
         }
 
-        public Game AuthenticateUser(string gameGuid, IRequestCookieCollection cookies) {
+        public bool AuthenticateUser(string gameGuid, IRequestCookieCollection cookies) {
             if (!Guid.TryParse(gameGuid, out var guid))
-                return null;
+                return false;
 
             if (!cookies.ContainsKey("id") || !cookies.ContainsKey("secret"))
-                return null;
+                return false;
 
             if (!Guid.TryParse(cookies["id"], out var clientGuid))
-                return null;
+                return false;
             string clientSecret = cookies["secret"];
 
-            if (!GameManager.Getinstance().AuthenticateUser(guid, clientGuid, clientSecret))
-                return null;
-
-            return _games.Find(g => g.Guid == guid);
+            return GameManager.GetInstance().AuthenticateUser(guid, clientGuid, clientSecret);
         }
         public bool AuthenticateUser(Guid gameGuid, Guid clientGuid, string clientSecret) {
-            Game game = _games.Find(g => g.Guid == gameGuid);
+            Game game = this.GetGameById(gameGuid);
             if (game == null)
                 return false;
 
-            foreach (var c in game.GetClients()) {
-                if (c.Id == clientGuid && c.AuthCookie == clientSecret)
-                    return true;
-            }
-
-            return false;
+            Client c = this.GetClientById(clientGuid);
+            return c != null && c.AuthCookie == clientSecret;
         }
 
         /// <summary>
@@ -51,7 +45,7 @@ namespace server {
         }
 
         /// <summary>
-        ///     Creates a new Game
+        /// Creates a new Game
         /// </summary>
         /// <returns>a new Game</returns>
         public Game CreateGame() {
@@ -61,11 +55,23 @@ namespace server {
             return g;
         }
 
-        public static GameManager Getinstance() {
-            if (_instance == null)
-                _instance = new GameManager();
-
-            return _instance;
+        /// <summary>
+        /// Game has ended. Remove it.
+        /// </summary>
+        /// <param name="game">The Guid of the Game to remove</param>
+        /// <returns>Success</returns>
+        public bool CloseGame(Guid game) {
+            var g = this.GetGameById(game);
+            return g != null && _games.Remove(g);
         }
+
+        public Game GetGameById(string id) => Guid.TryParse(id, out var guid) ? GetGameById(guid) : null;
+        public Game GetGameById(Guid id) => _games.Find(g => g.Guid == id);
+
+        public Client GetClientById(string id) => Guid.TryParse(id, out var guid) ? GetClientById(guid) : null;
+        public Client GetClientById(Guid id) =>
+            _games.SelectMany(g => g.GetClients()).FirstOrDefault(c => c != null && id == c.Id);
+
+        public static GameManager GetInstance() => _instance ?? (_instance = new GameManager());
     }
 }

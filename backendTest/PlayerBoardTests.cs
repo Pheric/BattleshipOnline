@@ -83,10 +83,10 @@ namespace serverTest {
             Assert.AreEqual(true, exists);
 
             bool invalid = v.RemoveCell(new KeyValuePair<int, int>(5, 4));
-            Assert.AreEqual(false, exists);
+            Assert.AreEqual(false, invalid);
 
             invalid = v.RemoveCell(new KeyValuePair<int, int>(2, 3)); // already removed
-            Assert.AreEqual(false, exists);
+            Assert.AreEqual(false, invalid);
         }
     }
 }

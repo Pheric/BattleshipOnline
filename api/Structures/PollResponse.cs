@@ -7,10 +7,10 @@ namespace api {
         public Guid Guid { get; }
         public GameState State { get; }
         public List<int> VLengths { get; }
-        public List<Dictionary<KeyValuePair<int, int>, bool>> ActiveClientVessels { get; }
+        public List<List<KeyValuePair<int, int>>> ActiveClientVessels { get; }
 
         public PollResponse(Guid guid, GameState state, List<int> vlengths,
-            List<Dictionary<KeyValuePair<int, int>, bool>> activeClientVessels) {
+            List<List<KeyValuePair<int, int>>> activeClientVessels) {
             this.Guid = guid;
             this.State = state;
             this.VLengths = vlengths;

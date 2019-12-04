@@ -1,7 +1,6 @@
 namespace server {
     public enum GameState {
-        REGISTRATION, // waiting for enough players to register
-        SETUP, // waiting for all players to submit their board settings
+        SETUP, // waiting for players to register and submit their board settings
         PLAYER1, // waiting for player1 to fire
         PLAYER2, // waiting for player2 to fire
         TIMEOUT, // waiting for opponent to reconnect
