@@ -4,16 +4,11 @@ using server;
 
 namespace api {
     public struct PollResponse {
-        public Guid Guid { get; }
         public GameState State { get; }
-        public List<int> VLengths { get; }
-        public List<List<KeyValuePair<int, int>>> ActiveClientVessels { get; }
+        public Dictionary<KeyValuePair<int, int>, HitState> ActiveClientVessels { get; }
 
-        public PollResponse(Guid guid, GameState state, List<int> vlengths,
-            List<List<KeyValuePair<int, int>>> activeClientVessels) {
-            this.Guid = guid;
+        public PollResponse(GameState state, Dictionary<KeyValuePair<int, int>, HitState> activeClientVessels) {
             this.State = state;
-            this.VLengths = vlengths;
             this.ActiveClientVessels = activeClientVessels;
         }
     }

@@ -11,12 +11,15 @@ namespace server {
             Cols = cols;
             VesselLengths = vesselLengths;
             _vessels = new List<Vessel>();
+            StrikeRecord = new Dictionary<KeyValuePair<int, int>, HitState>();
         }
 
         public int Rows { get; }
         public int Cols { get; }
 
         public List<int> VesselLengths { get; }
+
+        public Dictionary<KeyValuePair<int, int>, HitState> StrikeRecord { get; }
 
         public List<Vessel> Vessels {
             get => _vessels;
@@ -56,11 +59,17 @@ namespace server {
         /// <param name="cell">The coordinates of the target cell</param>
         /// <returns>Whether a vessel was hit</returns>
         public bool StrikeCell(KeyValuePair<int, int> cell) {
-            foreach (var v in _vessels) {
-                if (v.RemoveCell(cell))
-                    return true;
+            if (StrikeRecord.ContainsKey(cell))
+                throw new ArgumentException();
+            if (cell.Key < 0 || cell.Value < 0 || cell.Key >= Rows || cell.Value >= Cols)
+                throw new ArgumentException();
+            
+            if (_vessels.Any(v => v.RemoveCell(cell))) {
+                this.StrikeRecord.Add(cell, HitState.HIT);
+                return true;
             }
 
+            this.StrikeRecord.Add(cell, HitState.MISSED);
             return false;
         }
 
@@ -75,13 +84,5 @@ namespace server {
         /// </summary>
         /// <returns>Whether all Vessels have been sunk</returns>
         public bool IsLost() => _vessels.All(v => v.IsSunk());
-
-        /// <summary>
-        /// Exports all hit cells in all Vessels. Safe to return to an opponent because
-        /// all undamaged cells are not included.
-        /// </summary>
-        /// <returns>A List of Vessels, where every Vessel is a List of its damaged cells</returns>
-        public List<List<KeyValuePair<int, int>>> ExportVessels() =>
-            Vessels.Select(v => v.ExportCells()).ToList();
     }
 }

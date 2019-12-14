@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace server {
     public class Game {
@@ -36,7 +37,7 @@ namespace server {
 
             Rows = 8;
             Cols = 8;
-            VesselLengths = new List<int>(new[] {2, 3, 3, 5});
+            VesselLengths = new List<int>(new[] {5, 4, 3, 3, 2});
         }
 
         /// <summary>
@@ -55,36 +56,28 @@ namespace server {
         /// If a VICTOR state is set, this method will close and delete this game instance
         /// through the GameManager.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The new (current) GameState</returns>
         public GameState IncrementState() {
             switch (State) {
                 case GameState.SETUP:
                     if (_clients.All(c => c != null && c.Board.IsSet())) {
-                        this._state = GameState.PLAYER1; // TODO Random player starts
+                        this._state = new Random().Next(2) == 0 ? GameState.PLAYER1 : GameState.PLAYER2;
                         this._prevState = _state;
                     }
                     break;
-                case GameState.PLAYER1: // TODO Call Game#IsComplete
-                    if (this.IsComplete())
-                        break;
-                    this._state = GameState.PLAYER2;
-                    this._prevState = _state;
-                    break;
+                case GameState.PLAYER1:
                 case GameState.PLAYER2:
                     if (this.IsComplete())
                         break;
-                    this._state = GameState.PLAYER1;
+                    this._state = this._state == GameState.PLAYER1 ? GameState.PLAYER2 : GameState.PLAYER1;
                     this._prevState = _state;
-                    break;
-                case GameState.TIMEOUT:
-                    this._state = this._prevState;
                     break;
                 case GameState.PLAYER1VICTOR:
                 case GameState.PLAYER2VICTOR:
                     GameManager.GetInstance().CloseGame(this.Guid);
                     break;
                 default:
-                    throw new NotImplementedException("Invalid GameState on Game#IncrementState()");
+                    throw new ArgumentException("Invalid GameState on Game#IncrementState()");
             }
 
             return _state;
@@ -102,7 +95,6 @@ namespace server {
                 _clients[0] = c;
             } else {
                 _clients[1] = c;
-                this._state = GameState.SETUP;
             }
 
             return c;

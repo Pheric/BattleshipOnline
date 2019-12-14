@@ -16,6 +16,10 @@ namespace api {
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseConfiguration(new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("hosting.json", optional: true)
+                    .Build())
                 .UseStartup<Startup>();
     }
 }

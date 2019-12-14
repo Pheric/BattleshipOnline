@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using server;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -75,11 +76,17 @@ namespace api.Controllers {
             if (c != g.GetActiveClient())
                 return BadRequest();
 
-            g.IncrementState();
+            
             
             var opponent = g.GetClients()[0] == c ? g.GetClients()[1] : g.GetClients()[0];
 
-            return Ok(opponent.Board.StrikeCell(strikeRequest.Coordinate));
+            try {
+                var ret = opponent.Board.StrikeCell(strikeRequest.Coordinate);
+                g.IncrementState();
+                return Ok(ret);
+            } catch (ArgumentException e) {
+                return BadRequest();
+            }
         }
 
         [HttpGet("{guid}/poll")]
@@ -91,7 +98,7 @@ namespace api.Controllers {
             var g = GameManager.GetInstance().GetGameById(guid);
             
             var response =
-                new PollResponse(g.Guid, g.State, g.VesselLengths, g.GetActiveClient()?.Board?.ExportVessels());
+                new PollResponse(g.State, g.GetActiveClient()?.Board?.StrikeRecord);
 
             return Ok(response);
         }

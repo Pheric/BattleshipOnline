@@ -83,4 +83,9 @@ namespace server {
         Down,
         Left
     }
+
+    public enum HitState {
+        MISSED,
+        HIT
+    }
 }
