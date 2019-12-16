@@ -46,7 +46,7 @@ namespace api.Controllers {
                 return NotFound();
 
             var g = GameManager.GetInstance().GetGameById(guid);
-            if (g.State != GameState.SETUP)
+            if (g.State != GameState.Setup)
                 return BadRequest();
             
             var c = GameManager.GetInstance().GetClientById(Request.Cookies["id"]);
@@ -69,7 +69,7 @@ namespace api.Controllers {
                 return NotFound();
             
             var g = GameManager.GetInstance().GetGameById(guid);
-            if (g.State != GameState.PLAYER1 && g.State != GameState.PLAYER2)
+            if (g.State != GameState.Player1 && g.State != GameState.Player2)
                 return BadRequest();
             
             var c = GameManager.GetInstance().GetClientById(Request.Cookies["id"]);

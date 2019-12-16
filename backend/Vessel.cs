@@ -8,14 +8,14 @@ namespace server {
         public Vessel(KeyValuePair<int, int> location, int length = 3,
             VesselOrientation orientation = VesselOrientation.Right) {
             Orientation = orientation;
-            _cells = generateCells(location, length, orientation);
+            _cells = GenerateCells(location, length, orientation);
         }
 
         public VesselOrientation Orientation { get; }
         public Dictionary<KeyValuePair<int, int>, bool> Cells => new Dictionary<KeyValuePair<int, int>, bool>(_cells);
         public int Length => Cells.Count;
 
-        private Dictionary<KeyValuePair<int, int>, bool> generateCells(KeyValuePair<int, int> location, int length,
+        private Dictionary<KeyValuePair<int, int>, bool> GenerateCells(KeyValuePair<int, int> location, int length,
             VesselOrientation orientation) {
             var cells = new Dictionary<KeyValuePair<int, int>, bool>();
             switch (orientation) {
@@ -85,7 +85,7 @@ namespace server {
     }
 
     public enum HitState {
-        MISSED,
-        HIT
+        Missed,
+        Hit
     }
 }

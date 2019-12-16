@@ -8,7 +8,7 @@ namespace server {
         private static GameManager _instance;
         private readonly List<Game> _games;
 
-        public GameManager() {
+        private GameManager() {
             _games = new List<Game>();
         }
 

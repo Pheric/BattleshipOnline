@@ -1,0 +1,147 @@
+@startuml
+namespace server {
+    Game - Client
+    Game - GameState
+    GameManager "1" *-- "many" Game
+    GameManager - Client
+    Client - PlayerBoard
+    Client - Utils
+    PlayerBoard "1" *-- "1..*" HitState
+    PlayerBoard "1" *-- "1..*" Vessel
+    Vessel - VesselOrientation
+
+    class Client {
+        +<<get>> Id : Guid
+        +<<get>> AuthCookie : string
+        +Board : PlayerBoard
+        
+        +Client(board : PlayerBoard)
+    }
+    
+    class Game {
+        +<<get>> Guid : Guid
+        +<<get>> Password : string
+        
+        -_state : GameState
+        +State : GameState
+        -_prevState : GameState
+        
+        +<<get>>Rows : int
+        +<<get>>Cols : int
+        +<<get>>VesselLengths : List<int>
+        -_clients : Client[]
+        
+        +Game()
+        +GetClients() : ReadOnlyCollection<Client>
+        +IncrementState() : GameState
+        +AddClient() : Client
+        +GetActiveClient() : Client
+        +IsComplete() : bool
+    }
+    
+    enum GameState {
+        Setup
+        Player1
+        Player2
+        Player1Victor
+        Player2Victor
+    }
+    
+    class GameManager <<Singleton>> {
+        -{static} _instance : GameManager
+        -_games : List<Game>
+        
+        -GameManager()
+        +{static} GetInstance() : GameManager
+        +AuthenticateUser(gameGuid : string, cookies : IRequestCookieCollection) : bool
+        +AuthenticateUser(gameGuid: Guid, clientGuid : Guid, clientSecret : string) : bool
+        +RegisterClient(gameGuid : Guid, gamePassword : string) Client
+        +CreateGame() : Game
+        +CloseGame : bool
+        
+        +GetGameById(id : string) : Game
+        +GetGameById(id : Guid) : Game
+        
+        +GetClientbyId(id : string) : Client
+        +GetClientbyId(id : Guid) : Client
+    }
+    
+    class PlayerBoard {
+        -_vessels : List<Vessel>
+        
+        +PlayerBoard(rows : int, cols : int, vesselLengths : List<int>)
+        +<<get>>Rows : int
+        +<<get>>Cols : int
+        +<<get>>VesselLengths: List<int>
+        +<<get>>StrikeRecord : Dictionary<KeyValuePair<int, int>, HitState>
+        +<<get, set>>Vessels : List<Vessel>
+        
+        +StrikeCell(cell : KeyValuePair<int, int>) : bool
+        +IsSet() : bool
+        +IsLost() : bool
+    }
+    
+    class Vessel {
+        -_cells : Dictionary<KeyValuePair<int, int>, bool>
+        +<<get>>Orientation : VesselOrientation
+        +GenerateCells(location : KeyValuePair<int, int>, length : int, orientation : VesselOrientation) : Dictionary<KeyValuePair<int, int>, bool>
+        +AssertPositionInBounds(xMax : int, yMax : int) : bool
+        +RemoveCell(cell : KeyValuePair<int, int>) : bool
+        +ExportCells() : List<KeyValuePair<int, int>>
+        
+        +Vessel(location : KeyValuePair<int, int>, length : int, orientation : VesselOrientation)
+    }
+    
+    enum VesselOrientation {
+        Up
+        Right
+        Down
+        Left
+    }
+    
+    enum HitState {
+        Missed
+        Hit
+    }
+    
+    class Utils {
+        +{static}SanitizeString(str : string) : string
+    }
+}
+
+api.Controllers.GameController - api.Structures.PollResponse
+api.Controllers.GameController - api.Structures.SetupRequest
+api.Controllers.GameController - api.Structures.StrikeRequest
+api.Controllers.GameController --|> ControllerBase
+api.Controllers.GameController - server.Client
+class api.Controllers.GameController {
+    +Get() : Game
+    +Register(guid : string, password : string) : ActionResult<Client>
+    +Setup(guid : string, setupRequest : SetupRequest) : ActionResult
+    +Strike(guid : string, strikeRequest : StrikeRequest) : ActionResult<bool>
+    +Poll(guid : string) : ActionResult<PollResponse>
+}
+    
+api.Structures.PollResponse - server.GameState
+api.Structures.PollResponse "1" *-- "1..*" server.HitState
+api.Structures.SetupRequest "1" *-- "1..*" server.Vessel
+        
+class api.Structures.PollResponse << (S,#FF7700) >> {
+    +<<get>>State : GameState
+    +<<get>>ActiveClientVessels : Dictionary<KeyValuePair<int, int>, HitState>
+        
+    +PollResponse(state : GameState, actveClientVessels : Dictionary<KeyValuePair<int, int>, HitState>
+}
+        
+class api.Structures.SetupRequest << (S,#FF7700) >> {
+    +Vessels : List<Vessel>
+        
+    +SetupRequest(vessels : List<Vessel>)
+}
+        
+class api.Structures.StrikeRequest << (S,#FF7700 >> {
+    +Coordinate : KeyValuePair<int, int>
+            
+    +StrikeRequest(coordinate : KeyValuePair<int, int>)
+}
+@enduml

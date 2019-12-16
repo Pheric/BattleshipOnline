@@ -32,7 +32,7 @@ namespace server {
 
                 Password = Utils.SanitizeString(Convert.ToBase64String(data).Remove(8));
             }
-            _state = GameState.SETUP;
+            _state = GameState.Setup;
             _prevState = _state;
 
             Rows = 8;
@@ -59,21 +59,21 @@ namespace server {
         /// <returns>The new (current) GameState</returns>
         public GameState IncrementState() {
             switch (State) {
-                case GameState.SETUP:
+                case GameState.Setup:
                     if (_clients.All(c => c != null && c.Board.IsSet())) {
-                        this._state = new Random().Next(2) == 0 ? GameState.PLAYER1 : GameState.PLAYER2;
+                        this._state = new Random().Next(2) == 0 ? GameState.Player1 : GameState.Player2;
                         this._prevState = _state;
                     }
                     break;
-                case GameState.PLAYER1:
-                case GameState.PLAYER2:
+                case GameState.Player1:
+                case GameState.Player2:
                     if (this.IsComplete())
                         break;
-                    this._state = this._state == GameState.PLAYER1 ? GameState.PLAYER2 : GameState.PLAYER1;
+                    this._state = this._state == GameState.Player1 ? GameState.Player2 : GameState.Player1;
                     this._prevState = _state;
                     break;
-                case GameState.PLAYER1VICTOR:
-                case GameState.PLAYER2VICTOR:
+                case GameState.Player1Victor:
+                case GameState.Player2Victor:
                     GameManager.GetInstance().CloseGame(this.Guid);
                     break;
                 default:
@@ -104,7 +104,7 @@ namespace server {
         /// Gets the active Client (if the Game is in a normal playing mode) or null
         /// </summary>
         /// <returns>The active Client or null</returns>
-        public Client GetActiveClient() => State == GameState.PLAYER1 ? _clients[0] : State == GameState.PLAYER2 ? _clients[1] : null;
+        public Client GetActiveClient() => State == GameState.Player1 ? _clients[0] : State == GameState.Player2 ? _clients[1] : null;
 
         /// <summary>
         /// Checks whether a player has won the game (based on ships remaining).
@@ -112,16 +112,16 @@ namespace server {
         /// </summary>
         /// <returns>Whether the game is over</returns>
         public bool IsComplete() {
-            if (_state == GameState.PLAYER1VICTOR || _state == GameState.PLAYER2VICTOR)
+            if (_state == GameState.Player1Victor || _state == GameState.Player2Victor)
                 return true;
 
             if (_clients[0].Board.IsLost()) {
-                _state = GameState.PLAYER2VICTOR;
+                _state = GameState.Player2Victor;
                 return true;
             }
             
             if (_clients[1].Board.IsLost()) {
-                _state = GameState.PLAYER1VICTOR;
+                _state = GameState.Player1Victor;
                 return true;
             }
 

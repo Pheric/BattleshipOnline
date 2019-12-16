@@ -65,11 +65,11 @@ namespace server {
                 throw new ArgumentException();
             
             if (_vessels.Any(v => v.RemoveCell(cell))) {
-                this.StrikeRecord.Add(cell, HitState.HIT);
+                this.StrikeRecord.Add(cell, HitState.Hit);
                 return true;
             }
 
-            this.StrikeRecord.Add(cell, HitState.MISSED);
+            this.StrikeRecord.Add(cell, HitState.Missed);
             return false;
         }
 
